@@ -12,10 +12,10 @@ import LoginContent from './screens/LoginContent';
 import CarritoScreen from './screens/Carrito';
 import DetalleProductoComponent from './screens/DetalleProducto'; // Import DetalleProductoComponent
 import Registro from './screens/Registro';
-
+import AuthenticationScreen from './screens/AuthenticationScreen'; // Import AuthenticationScreen
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator(); // Create a stack navigator
-import AuthenticationScreen from './screens/AuthenticationScreen'; // Import AuthenticationScreen
+
 
 const ProductosStackScreen = () => (
   <Stack.Navigator
@@ -23,6 +23,8 @@ const ProductosStackScreen = () => (
       headerShown: false,
     }}
   >
+    <Stack.Screen name="Login" component={LoginContent} />
+    <Stack.Screen name="Registro" component={Registro} />
     <Stack.Screen name="Productos" component={ProductosScreen} />
     <Stack.Screen name="DetalleProducto" component={DetalleProductoComponent} />
   </Stack.Navigator>
