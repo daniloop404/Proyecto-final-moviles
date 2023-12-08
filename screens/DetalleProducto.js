@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buyButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#000000',
     padding: 10,
     borderRadius: 5,
     marginTop: 5,

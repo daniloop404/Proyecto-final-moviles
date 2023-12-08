@@ -45,7 +45,7 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    marginTop: 0,
     marginBottom: 20,
   },
   col: {
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 20,
     color: 'black',
+    textAlign:'center',
   },
   image: {
     width: '100%',
