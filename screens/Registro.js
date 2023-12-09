@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Keyboa
 import { useNavigation } from '@react-navigation/native';
 import { postUsuario, checkUsernameExists, checkEmailExists } from '../services/UsuariosService';
 
+
 const Registro = () => {
   const navigation = useNavigation();
   const [nuevoUsuario, setNuevoUsuario] = useState({

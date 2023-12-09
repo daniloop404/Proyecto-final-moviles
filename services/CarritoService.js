@@ -7,8 +7,9 @@ export const getCarrito = (userKey) => {
   return axios.get(url);
 };
 
-export const agregarAlCarrito = (celular, userKey, celularKey, unidades, pagina) => {
-  return getCarrito(userKey).then((response) => {
+const agregarAlCarrito = async (celular, userKey, celularKey, unidades, pagina) => {
+  try {
+    const response = await getCarrito(userKey);
     const existingCarrito = response.data && response.data.carrito ? response.data.carrito : {};
     let updatedCarrito = { ...existingCarrito };
 
@@ -23,8 +24,11 @@ export const agregarAlCarrito = (celular, userKey, celularKey, unidades, pagina)
     }
 
     const url = `${API_CARRITO}/${userKey}.json`;
-    return axios.patch(url, { carrito: updatedCarrito });
-  });
+    await axios.patch(url, { carrito: updatedCarrito });
+  } catch (error) {
+    console.error('Error during agregarAlCarrito:', error);
+    throw error; // Handle the error appropriately in your application
+  }
 };
 
 export const eliminarDelCarrito = (userKey, celularKey) => {
@@ -46,4 +50,9 @@ export const eliminarDelCarrito = (userKey, celularKey) => {
 export const eliminarCarrito = (userKey) => {
   const url = `${API_CARRITO}/${userKey}/carrito.json`;
   return axios.delete(url);
+};
+export default {
+  getCarrito,
+  agregarAlCarrito,
+  eliminarDelCarrito,
 };

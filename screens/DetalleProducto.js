@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
 import CelularesService from '../services/CelularesService';
+import CarritoService from '../services/CarritoService'; 
+import LoginService from '../services/LoginService'; 
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const DetalleProducto = ({ route }) => {
   const [celular, setCelular] = useState({
@@ -15,6 +26,7 @@ const DetalleProducto = ({ route }) => {
     almacenamiento: 0,
     unidades: 1,
   });
+  const navigation = useNavigation();
 
   useEffect(() => {
     const { key } = route.params;
@@ -54,9 +66,40 @@ const DetalleProducto = ({ route }) => {
       });
   };
 
-  const comprar = () => {
-    // Your buy logic here
-    // ...
+  const comprar = async () => {
+    const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
+
+    // Check if the user is authenticated
+    if (await LoginService.isAuthenticated()) {
+      const celularKey = celular.key;
+
+      const celularForService = {
+        marca: celular.marca,
+        modelo: celular.modelo,
+        precio: celular.precio,
+        imagen_url: celular.imagen_url,
+      };
+      const lugar = 'detalle';
+
+      CarritoService.agregarAlCarrito(
+        celularForService,
+        userKey,
+        celularKey,
+        celular.unidades,
+        lugar
+      )
+        .then(() => {
+          // Redirect to the carritoCompras component
+          // Navigate using React Navigation
+          navigation.navigate('Carrito');
+        })
+        .catch((error) => {
+          console.error('Error adding to cart:', error);
+        });
+    } else {
+      // User is not authenticated, redirect to login
+      navigation.navigate('Login');
+    }
   };
 
   return (
@@ -64,7 +107,11 @@ const DetalleProducto = ({ route }) => {
       <View style={styles.row}>
         <View style={styles.col}>
           {celular.imagen_url ? (
-            <Image source={{ uri: celular.imagen_url }} style={styles.productImage} resizeMode="cover" />
+            <Image
+              source={{ uri: celular.imagen_url }}
+              style={styles.productImage}
+              resizeMode="cover"
+            />
           ) : (
             <Text>No image available</Text>
           )}
@@ -84,11 +131,21 @@ const DetalleProducto = ({ route }) => {
             value={celular.unidades.toString()}
             readOnly
           />
-          <TouchableOpacity onPress={comprar} style={styles.buyButton} disabled={!celular.isAdmind}>
+          <TouchableOpacity
+            onPress={comprar}
+            style={styles.buyButton}
+            
+          >
             <Text style={styles.buyButtonText}>Agregar al carrito</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>Regresar a Catálogo</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -98,6 +155,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 50,
     marginBottom: 20,
+  },
+  backButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  backButtonText: {
+    color: '#000',
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',

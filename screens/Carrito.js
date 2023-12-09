@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, Button, Alert } from 'react-native';
+import { View, Text, Button, Image, TextInput, Alert,StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { getCarrito, agregarAlCarrito, eliminarDelCarrito, eliminarCarrito } from '../services/CarritoService';
 import { getUsuarioPorId } from '../services/UsuariosService';
 import { agregarFactura } from '../services/FacturaService';
@@ -10,9 +11,8 @@ const CarritoComprasComponent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const userKey = sessionStorage.getItem('userKey') || 'defaultUserKey';
-
       try {
+        const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
         const response = await getCarrito(userKey);
         const carrito = response.data.carrito || {};
 
@@ -44,7 +44,7 @@ const CarritoComprasComponent = () => {
   };
 
   const realizarPedido = async () => {
-    const userKey = sessionStorage.getItem('userKey') || 'defaultUserKey';
+    const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
 
     try {
       const userData = await getUsuarioPorId(userKey);
@@ -76,7 +76,7 @@ const CarritoComprasComponent = () => {
   };
 
   const actualizarUnidades = async (item) => {
-    const userKey = sessionStorage.getItem('userKey') || 'defaultUserKey';
+    const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
     const lugar = 'carrito';
 
     try {
@@ -97,7 +97,7 @@ const CarritoComprasComponent = () => {
   };
 
   const eliminarItem = async (itemKey) => {
-    const userKey = sessionStorage.getItem('userKey') || 'defaultUserKey';
+    const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
 
     try {
       await eliminarDelCarrito(userKey, itemKey);
@@ -119,9 +119,83 @@ const CarritoComprasComponent = () => {
     return costoTotal + iva;
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      marginVertical: 16,
+      padding: 16,
+      backgroundColor: '#eee',
+    },
+    itemContainer: {
+      flexDirection: 'row',
+    },
+    image: {
+      width: 100,
+      height: 100,
+    },
+    itemDetails: {
+      marginLeft: 16,
+    },
+    subtotalAndButtonContainer: {
+      marginLeft: 'auto',
+      alignItems: 'flex-end',
+    },
+  });
+
   return (
     <View>
-      {/* Render your React Native UI here using the converted HTML structure */}
+      <Text style={{ textAlign: "center", fontSize: 24, marginVertical: 16 }}>
+        Carrito de Compras
+      </Text>
+  
+      {carritoData.length > 0 ? (
+        carritoData.map((item) => (
+          <View key={item.key} style={styles.container}>
+            <View style={styles.itemContainer}>
+              <Image source={{ uri: item.info.imagen_url }} style={styles.image} />
+              <View style={styles.itemDetails}>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {item.info.marca} {item.info.modelo}
+                </Text>
+                <Text>Precio: ${item.info.precio}</Text>
+                <Text>Cantidad:</Text>
+                <TextInput
+                  style={{ borderWidth: 1, padding: 4, width: 50 }}
+                  value={item.unidades.toString()}
+                  onChangeText={(text) =>
+                    actualizarUnidades({ ...item, unidades: parseInt(text) })
+                  }
+                />
+              </View>
+            </View>
+            <View style={styles.subtotalAndButtonContainer}>
+              <Text>Subtotal: ${item.subtotal.toFixed(2)}</Text>
+              <Button
+                title="Eliminar"
+                onPress={() => eliminarItem(item.key)}
+                color="red"
+              />
+            </View>
+          </View>
+        ))
+      ) : (
+        <View style={{ marginVertical: 16, alignItems: "center" }}>
+          <Text>El carrito está vacío. Revisa nuestra selección y llénalo.</Text>
+        </View>
+      )}
+  
+      {carritoData.length > 0 && (
+        <View style={{ marginVertical: 16, alignItems: "center" }}>
+          <Button title="Realizar Pedido" onPress={confirmRealizarPedido} />
+        </View>
+      )}
+  
+      {carritoData.length > 0 && (
+        <View style={{ marginVertical: 16, alignItems: "center" }}>
+          <Text>
+            Costo Total con IVA (12%): ${calcularCostoTotal().toFixed(2)}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

@@ -25,6 +25,7 @@ export const login = async (username, password) => {
   }
 };
 
+
 export const logout = async () => {
   try {
     // Remove user information and key from AsyncStorage on logout
@@ -87,4 +88,12 @@ export const getUserKey = async () => {
     console.error('Error during getUserKey:', error);
     throw error; // Handle the error appropriately in your application
   }
+};
+export default {
+  login,
+  logout,
+  isAuthenticated,
+  getRole,
+  getNombre,
+  getUserKey,
 };

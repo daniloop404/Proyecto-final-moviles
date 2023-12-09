@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -12,10 +12,13 @@ import CarritoScreen from './screens/Carrito';
 import DetalleProductoComponent from './screens/DetalleProducto'; 
 import Registro from './screens/Registro';
 import AuthenticationScreen from './screens/AuthenticationScreen'; 
+import Perfil from './screens/Perfil';
+import { isAuthenticated } from './services/LoginService';
 
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
 const tabBarIcons = {
   CeluQuito: () => <Ionicons name="home-outline" size={24} color="#000" />,
   Catalogo: () => <Ionicons name="list-outline" size={24} color="#000" />,
@@ -33,18 +36,36 @@ const ProductosStackScreen = () => (
     <Stack.Screen name="DetalleProducto" component={DetalleProductoComponent} />
   </Stack.Navigator>
 );
-const AuthenticationStackScreen = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerShown: false,
-    }}
-  >
-    <Tab.Screen name="Authentication" component={AuthenticationScreen} />
-    <Stack.Screen name="Login" component={LoginContent} />
-    <Stack.Screen name="Registro" component={Registro} />
-  </Stack.Navigator>
-);
+const AuthenticationStackScreen = () => {
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
+  useEffect(() => {
+    const checkAuthenticationStatus = async () => {
+      const authenticated = await isAuthenticated();
+      setIsUserAuthenticated(authenticated);
+    };
+
+    checkAuthenticationStatus();
+  }, []);
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {isUserAuthenticated ? (
+        <Stack.Screen name="Perfil" component={Perfil} />
+      ) : (
+        <>
+          <Tab.Screen name="Authentication" component={AuthenticationScreen} />
+          <Stack.Screen name="Login" component={LoginContent} />
+          <Stack.Screen name="Registro" component={Registro} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+};
 
 
 const App = () => (

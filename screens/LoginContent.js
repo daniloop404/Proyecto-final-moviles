@@ -12,13 +12,14 @@ const LoginContent = () => {
   const onSubmit = async () => {
     try {
       const result = await login(username, password);
-
+  
       if (result) {
+        console.log('Login successful, navigating to home...'); // Add this line
         // Redirect based on the user's role
         const userRole = result.user.rol;
-
+  
         if (userRole === 'usuario' || userRole === 'administrador') {
-          navigation.navigate('Home'); // Replace 'Home' with the appropriate screen name
+          navigation.navigate('CeluQuito'); // Replace 'Home' with the appropriate screen name
         } else {
           setErrorMessage('Usuario o contraseña incorrecto');
         }
