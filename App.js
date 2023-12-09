@@ -28,8 +28,7 @@ const ProductosStackScreen = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="Login" component={LoginContent} />
-    <Stack.Screen name="Registro" component={Registro} />
+    
     <Stack.Screen name="Productos" component={ProductosScreen} />
     <Stack.Screen name="DetalleProducto" component={DetalleProductoComponent} />
   </Stack.Navigator>

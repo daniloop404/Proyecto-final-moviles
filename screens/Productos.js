@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     margin: 5,
-    backgroundColor: '#000000',
+    backgroundColor: '#3498db',
   },
   navButtonText: {
     color: 'white',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   detailsButton: {
-    backgroundColor: '#000000',
+    backgroundColor: '#3498db',
     padding: 10,
     borderRadius: 5,
     marginTop: 5,
