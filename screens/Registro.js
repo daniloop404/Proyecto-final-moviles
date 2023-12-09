@@ -148,11 +148,7 @@ const Registro = () => {
             <Text style={styles.buttonText}>Registrarse</Text>
           </TouchableOpacity>
 
-          {!usernameExists && !emailExists ? (
-            <Text style={styles.successMessage}>Todos los datos llenos.</Text>
-          ) : (
-            <Text style={styles.errorMessage}>Se deben llenar todos los datos.</Text>
-          )}
+         
 
           <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
             ¿Ya tienes cuenta? Presiona aquí
@@ -195,7 +191,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#000000',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -219,7 +215,7 @@ const styles = StyleSheet.create({
   link: {
     textAlign: 'center',
     marginTop: 10,
-    color: 'blue',
+    color: '#000000',
   },
 });
 
