@@ -57,10 +57,7 @@ const LoginContent = () => {
       <Text style={styles.link} onPress={navigateToRegistro}>
         ¿No tienes cuenta? Regístrate aquí
       </Text>
-      {/* Add the button or text for registration */}
-      <TouchableOpacity style={styles.registerButton} onPress={navigateToRegistro}>
-        <Text style={styles.registerButtonText}>No tienes cuenta, regístrate aquí</Text>
-      </TouchableOpacity>
+      
     </View>
   );
 };
@@ -84,7 +81,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   button: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#000000',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -96,7 +93,7 @@ const styles = StyleSheet.create({
   link: {
     textAlign: 'center',
     marginTop: 16,
-    color: '#3498db',
+    color: '#000000',
   },
   error: {
     color: 'red',
