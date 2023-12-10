@@ -44,11 +44,23 @@ const CarritoComprasComponent = () => {
   };
 
   const realizarPedido = async () => {
-    const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
-
     try {
-      const userData = await getUsuarioPorId(userKey);
-
+      const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
+  
+      const userDataResponse = await getUsuarioPorId(userKey);
+      const userData = userDataResponse.data; // Assuming getUsuarioPorId returns data property
+  
+      const carritoDataResponse = await getCarrito(userKey);
+      const carritoDataObject = carritoDataResponse.data.carrito || {};
+  
+      // Convert carritoDataObject to an array with correct structure
+      const carritoData = Object.keys(carritoDataObject).map(key => ({
+        key, // Extract the key from the nested structure
+        ...carritoDataObject[key],
+        unidades: carritoDataObject[key].unidades,
+        subtotal: carritoDataObject[key].info.precio * carritoDataObject[key].unidades,
+      }));
+  
       const facturaData = {
         usuario: {
           nombre: userData.nombre,
@@ -60,15 +72,15 @@ const CarritoComprasComponent = () => {
         total: calcularCostoTotal(),
         fecha: new Date().toISOString(),
       };
-
+  
       await agregarFactura(userKey, facturaData);
       await eliminarCarrito(userKey);
-
+  
       // Refresh the carrito data after removing the items
       const updatedCarritoData = await getCarrito(userKey);
       setCarritoData(updatedCarritoData.data.carrito || []);
       setIsCartEmpty(true);
-
+  
       // You might need to handle navigation or other actions here
     } catch (error) {
       console.error('Error processing pedido', error);
