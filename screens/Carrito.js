@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, Image, TextInput, Alert,StyleSheet,ScrollView } from 'react-native';
+import { View, Text, Button, Image, TextInput, Alert,StyleSheet,ScrollView,TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { getCarrito, agregarAlCarrito, eliminarDelCarrito, eliminarCarrito } from '../services/CarritoService';
 import { getUsuarioPorId } from '../services/UsuariosService';
@@ -75,19 +75,22 @@ const CarritoComprasComponent = () => {
     }
   };
 
-  const actualizarUnidades = async (item) => {
+  const actualizarUnidades = async (item, newUnits) => {
     const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
     const lugar = 'carrito';
 
+    // Ensure newUnits is a number between 1 and 10
+    const validatedUnits = Math.min(Math.max(parseInt(newUnits) || 1, 1), 10);
+
     try {
-      await agregarAlCarrito(item.info, userKey, item.key, item.unidades, lugar);
+      await agregarAlCarrito(item.info, userKey, item.key, validatedUnits, lugar);
 
       // Update the current item's subtotal and units
-      item.subtotal = item.info.precio * item.unidades;
+      item.subtotal = item.info.precio * validatedUnits;
 
       // Update the local carritoData array
       const updatedCarritoData = carritoData.map((cartItem) =>
-        cartItem.key === item.key ? { ...item } : cartItem,
+        cartItem.key === item.key ? { ...item, unidades: validatedUnits } : cartItem,
       );
 
       setCarritoData(updatedCarritoData);
@@ -95,26 +98,31 @@ const CarritoComprasComponent = () => {
       console.error('Error updating unidades', error);
     }
   };
-
   const eliminarItem = async (itemKey) => {
     const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
-
+  
     try {
       await eliminarDelCarrito(userKey, itemKey);
-
+  
       // Update the cart data after removing the item
-      const updatedCarritoData = await getCarrito(userKey);
-      setCarritoData(updatedCarritoData.data.carrito || []);
-
+      const updatedCarritoDataResponse = await getCarrito(userKey);
+  
+      // Check if the response has a data property
+      const updatedCarritoData = updatedCarritoDataResponse.data && updatedCarritoDataResponse.data.carrito
+        ? updatedCarritoDataResponse.data.carrito
+        : [];
+  
+      setCarritoData(updatedCarritoData);
+  
       // Check if the cart is empty
-      setIsCartEmpty(updatedCarritoData.data.carrito.length === 0);
-
+      setIsCartEmpty(updatedCarritoData.length === 0);
+  
       // Reset the application after eliminating an item
       navigation.reset({
         index: 0,
         routes: [{ name: 'Carrito' }], // Adjust the route name based on your navigation setup
       });
-
+  
       // Optionally, you can force a re-render by toggling a state
       // e.g., if you have a state like refreshScreen, you can do:
       // setRefreshScreen((prev) => !prev);
@@ -128,6 +136,23 @@ const CarritoComprasComponent = () => {
     const iva = costoTotal * 0.12;
     return costoTotal + iva;
   };
+  const QuantityInput = ({ value, onIncrease, onDecrease }) => (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <TouchableOpacity onPress={onDecrease}>
+        <Text style={{ fontSize: 20, marginRight: 8 }}>-</Text>
+      </TouchableOpacity>
+      <TextInput
+        style={{ borderWidth: 1, padding: 4, width: 50, textAlign: 'center' }}
+        value={value.toString()}
+        keyboardType="numeric"
+        maxLength={2}
+        editable={false} // Disable direct input
+      />
+      <TouchableOpacity onPress={onIncrease}>
+        <Text style={{ fontSize: 20, marginLeft: 8 }}>+</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   const styles = StyleSheet.create({
     container: {
@@ -150,7 +175,6 @@ const CarritoComprasComponent = () => {
       alignItems: 'flex-end',
     },
   });
-
   return (
     <ScrollView>
     <View>
@@ -169,12 +193,10 @@ const CarritoComprasComponent = () => {
                 </Text>
                 <Text>Precio: ${item.info.precio}</Text>
                 <Text>Cantidad:</Text>
-                <TextInput
-                  style={{ borderWidth: 1, padding: 4, width: 50 }}
-                  value={item.unidades.toString()}
-                  onChangeText={(text) =>
-                    actualizarUnidades({ ...item, unidades: parseInt(text) })
-                  }
+                <QuantityInput
+                  value={item.unidades}
+                  onIncrease={() => actualizarUnidades(item, item.unidades + 1)}
+                  onDecrease={() => actualizarUnidades(item, item.unidades - 1)}
                 />
               </View>
             </View>

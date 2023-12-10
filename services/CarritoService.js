@@ -7,13 +7,21 @@ export const getCarrito = (userKey) => {
   return axios.get(url);
 };
 
-const agregarAlCarrito = async (celular, userKey, celularKey, unidades, pagina) => {
+export const agregarAlCarrito = async (celular, userKey, celularKey, unidades, pagina) => {
   try {
     const existingCarritoResponse = await getCarrito(userKey);
     const existingCarrito = existingCarritoResponse.data && existingCarritoResponse.data.carrito ? existingCarritoResponse.data.carrito : {};
 
-    const uniqueKey = `${celularKey}_${new Date().getTime()}`;
-    existingCarrito[uniqueKey] = { unidades, info: celular };
+    const existingItem = Object.values(existingCarrito).find(item => item.info.modelo === celular.modelo);
+
+    if (existingItem) {
+      // If the same model exists, update the quantity
+      existingItem.unidades = unidades; // Update the units directly
+    } else {
+      // If it's a new model, create a new entry
+      const uniqueKey = `${celularKey}_${new Date().getTime()}`;
+      existingCarrito[uniqueKey] = { unidades, info: celular };
+    }
 
     const url = `${API_CARRITO}/${userKey}.json`;
     await axios.patch(url, { carrito: existingCarrito });
@@ -48,4 +56,5 @@ export default {
   getCarrito,
   agregarAlCarrito,
   eliminarDelCarrito,
+  eliminarCarrito,
 };

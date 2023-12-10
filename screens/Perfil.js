@@ -116,24 +116,24 @@ const PerfilComponent = () => {
                 />
                 {/* Add other user properties as needed */}
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity onPress={cancelarEdicion} style={styles.button}>
-                    <Text>Cancelar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={guardarCambios} style={styles.button}>
-                    <Text>Guardar Cambios</Text>
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity onPress={cancelarEdicion} style={styles.cancelButton}>
+                      <Text style={styles.buttonText}>Cancelar</Text>
+                        </TouchableOpacity>
+                          <TouchableOpacity onPress={guardarCambios} style={styles.acceptButton}>
+                            <Text style={styles.buttonText}>Aceptar</Text>
+                          </TouchableOpacity>
+                  </View>
               </View>
             </View>
           )}
-          <View style={styles.center}>
+           <View style={styles.center}>
             {!isEditing && (
               <>
-                <TouchableOpacity onPress={modificarDatos} style={styles.button}>
-                  <Text>Modificar Datos</Text>
+                <TouchableOpacity onPress={modificarDatos} style={styles.blackButton}>
+                  <Text style={styles.buttonText}>Modificar Datos</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleLogout} style={styles.button}>
-                  <Text>Logout</Text>
+                <TouchableOpacity onPress={handleLogout} style={styles.blackButton}>
+                  <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
   },
   button: {
     backgroundColor: '#ddd',
@@ -182,7 +183,32 @@ const styles = StyleSheet.create({
     width: '48%',
     alignItems: 'center',
   },
+  blackButton: {
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
+    width: '48%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+  },
   center: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    width: '48%',
+    alignItems: 'center',
+  },
+  acceptButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    width: '48%',
     alignItems: 'center',
   },
 });
