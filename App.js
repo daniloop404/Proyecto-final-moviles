@@ -36,7 +36,7 @@ const ProductosStackScreen = () => (
     <Stack.Screen name="DetalleProducto" component={DetalleProductoComponent} />
   </Stack.Navigator>
 );
-const AuthenticationStackScreen = () => {
+const CarritoStackScreen = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -55,10 +55,36 @@ const AuthenticationStackScreen = () => {
       }}
     >
       {isUserAuthenticated ? (
+        <Stack.Screen name="Carro" component={CarritoScreen} />
+      ) : (
+        <Stack.Screen name="Authentication" component={AuthenticationScreen} />
+      )}
+    </Stack.Navigator>
+  );
+};
+const AuthenticationStackScreen = () => {
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuthenticationStatus = async () => {
+      const authenticated = await isAuthenticated();
+      setIsUserAuthenticated(authenticated);
+    };
+
+    checkAuthenticationStatus();
+  }, []);
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {isUserAuthenticated ? (
         <Stack.Screen name="Perfil" component={Perfil} />
       ) : (
         <>
-          <Tab.Screen name="Authentication" component={AuthenticationScreen} />
+          <Stack.Screen name="Authentication" component={AuthenticationScreen} />
           <Stack.Screen name="Login" component={LoginContent} />
           <Stack.Screen name="Registro" component={Registro} />
         </>
@@ -69,6 +95,7 @@ const AuthenticationStackScreen = () => {
 
 
 const App = () => (
+  
   <View style={styles.container}>
     <NavigationContainer>
     <Tab.Navigator
@@ -98,10 +125,10 @@ const App = () => (
     options={{ tabBarIcon: tabBarIcons.Usuario }}
   />
   <Tab.Screen
-    name="Carrito"
-    component={CarritoScreen}
-    options={{ tabBarIcon: tabBarIcons.Carrito }}
-  />
+          name="Carrito"
+          component={CarritoStackScreen}
+          options={{ tabBarIcon: tabBarIcons.Carrito }}
+        />
 </Tab.Navigator>
     </NavigationContainer>
     <StatusBar style="auto" />

@@ -9,25 +9,17 @@ export const getCarrito = (userKey) => {
 
 const agregarAlCarrito = async (celular, userKey, celularKey, unidades, pagina) => {
   try {
-    const response = await getCarrito(userKey);
-    const existingCarrito = response.data && response.data.carrito ? response.data.carrito : {};
-    let updatedCarrito = { ...existingCarrito };
+    const existingCarritoResponse = await getCarrito(userKey);
+    const existingCarrito = existingCarritoResponse.data && existingCarritoResponse.data.carrito ? existingCarritoResponse.data.carrito : {};
 
-    if (updatedCarrito[celularKey]) {
-      if (pagina === 'detalle') {
-        updatedCarrito[celularKey].unidades += unidades;
-      } else {
-        updatedCarrito[celularKey].unidades = unidades;
-      }
-    } else {
-      updatedCarrito[celularKey] = { unidades, info: celular };
-    }
+    const uniqueKey = `${celularKey}_${new Date().getTime()}`;
+    existingCarrito[uniqueKey] = { unidades, info: celular };
 
     const url = `${API_CARRITO}/${userKey}.json`;
-    await axios.patch(url, { carrito: updatedCarrito });
+    await axios.patch(url, { carrito: existingCarrito });
   } catch (error) {
     console.error('Error during agregarAlCarrito:', error);
-    throw error; // Handle the error appropriately in your application
+    throw error;
   }
 };
 
@@ -51,6 +43,7 @@ export const eliminarCarrito = (userKey) => {
   const url = `${API_CARRITO}/${userKey}/carrito.json`;
   return axios.delete(url);
 };
+
 export default {
   getCarrito,
   agregarAlCarrito,

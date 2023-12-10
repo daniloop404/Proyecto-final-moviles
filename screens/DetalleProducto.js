@@ -12,6 +12,7 @@ import CarritoService from '../services/CarritoService';
 import LoginService from '../services/LoginService'; 
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import { isAuthenticated } from '../services/LoginService';
 
 const DetalleProducto = ({ route }) => {
   const [celular, setCelular] = useState({
@@ -68,37 +69,34 @@ const DetalleProducto = ({ route }) => {
 
   const comprar = async () => {
     const userKey = await AsyncStorage.getItem('userKey') || 'defaultUserKey';
-
-    // Check if the user is authenticated
-    if (await LoginService.isAuthenticated()) {
-      const celularKey = celular.key;
-
-      const celularForService = {
-        marca: celular.marca,
-        modelo: celular.modelo,
-        precio: celular.precio,
-        imagen_url: celular.imagen_url,
-      };
-      const lugar = 'detalle';
-
-      CarritoService.agregarAlCarrito(
-        celularForService,
-        userKey,
-        celularKey,
-        celular.unidades,
-        lugar
-      )
-        .then(() => {
-          // Redirect to the carritoCompras component
-          // Navigate using React Navigation
-          navigation.navigate('Carrito');
-        })
-        .catch((error) => {
-          console.error('Error adding to cart:', error);
+  
+    try {
+      // Check if the user is authenticated
+      if (await isAuthenticated()) {
+        const celularKey = celular.key;
+  
+        const celularForService = {
+          marca: celular.marca,
+          modelo: celular.modelo,
+          precio: celular.precio,
+          imagen_url: celular.imagen_url,
+        };
+        const lugar = 'detalle';
+  
+        // Call the function to add to the cart
+        await CarritoService.agregarAlCarrito(celularForService, userKey, celularKey, celular.unidades, lugar);
+  
+        // Reset the navigation stack and navigate to the 'Carrito' screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Carrito' }],
         });
-    } else {
-      // User is not authenticated, redirect to login
-      navigation.navigate('Login');
+      } else {
+        // User is not authenticated, redirect to login
+        navigation.navigate('Usuario');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
   };
 

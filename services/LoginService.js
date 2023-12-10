@@ -11,13 +11,17 @@ export const login = async (username, password) => {
 
     for (const key of keys) {
       const user = users[key];
+      console.log('Checking user:', user);
+
       if (user.nombreUsuario === username && user.clave === password) {
+        console.log('Login successful for user:', user);
         // Store user information and key in AsyncStorage
         await AsyncStorage.setItem('user', JSON.stringify(user));
         await AsyncStorage.setItem('userKey', key);
         return { user, key };
       }
     }
+    console.log('Login failed. No matching user found.');
     return null;
   } catch (error) {
     console.error('Error during login:', error);

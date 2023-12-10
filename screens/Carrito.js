@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, Image, TextInput, Alert,StyleSheet } from 'react-native';
+import { View, Text, Button, Image, TextInput, Alert,StyleSheet,ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { getCarrito, agregarAlCarrito, eliminarDelCarrito, eliminarCarrito } from '../services/CarritoService';
 import { getUsuarioPorId } from '../services/UsuariosService';
 import { agregarFactura } from '../services/FacturaService';
-
+import { useNavigation } from '@react-navigation/native';
 const CarritoComprasComponent = () => {
   const [carritoData, setCarritoData] = useState([]);
   const [isCartEmpty, setIsCartEmpty] = useState(true);
-
+  const navigation = useNavigation();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,9 +105,19 @@ const CarritoComprasComponent = () => {
       // Update the cart data after removing the item
       const updatedCarritoData = await getCarrito(userKey);
       setCarritoData(updatedCarritoData.data.carrito || []);
-      setIsCartEmpty(true);
 
-      // You might need to handle navigation or other actions here
+      // Check if the cart is empty
+      setIsCartEmpty(updatedCarritoData.data.carrito.length === 0);
+
+      // Reset the application after eliminating an item
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Carrito' }], // Adjust the route name based on your navigation setup
+      });
+
+      // Optionally, you can force a re-render by toggling a state
+      // e.g., if you have a state like refreshScreen, you can do:
+      // setRefreshScreen((prev) => !prev);
     } catch (error) {
       console.error('Error deleting item from carrito', error);
     }
@@ -142,6 +152,7 @@ const CarritoComprasComponent = () => {
   });
 
   return (
+    <ScrollView>
     <View>
       <Text style={{ textAlign: "center", fontSize: 24, marginVertical: 16 }}>
         Carrito de Compras
@@ -197,6 +208,7 @@ const CarritoComprasComponent = () => {
         </View>
       )}
     </View>
+    </ScrollView>
   );
 };
 

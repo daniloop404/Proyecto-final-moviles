@@ -12,17 +12,15 @@ const LoginContent = () => {
   const onSubmit = async () => {
     try {
       const result = await login(username, password);
-  
+
       if (result) {
-        console.log('Login successful, navigating to home...'); // Add this line
-        // Redirect based on the user's role
-        const userRole = result.user.rol;
-  
-        if (userRole === 'usuario' || userRole === 'administrador') {
-          navigation.navigate('CeluQuito'); // Replace 'Home' with the appropriate screen name
-        } else {
-          setErrorMessage('Usuario o contraseña incorrecto');
-        }
+        console.log('Login successful, resetting app...');
+
+        // Reset the entire navigation stack to the 'CeluQuito' screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'CeluQuito' }],
+        });
       } else {
         setErrorMessage('Usuario o contraseña incorrecto');
       }
