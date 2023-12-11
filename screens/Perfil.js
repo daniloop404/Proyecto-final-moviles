@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet,ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUsuarioPorId, putUsuario } from '../services/UsuariosService'; // Update the import path accordingly
 import { getUserKey, logout } from '../services/LoginService'; // Update the import path accordingly
 import { getFacturas } from '../services/FacturaService'; // Import the FacturaService
 import { FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import PDFView from 'react-native-view-pdf';
+
+
 const PerfilComponent = () => {
   const [facturas, setFacturas] = useState([]);
   const [selectedFactura, setSelectedFactura] = useState(null);
@@ -89,19 +90,15 @@ const PerfilComponent = () => {
       console.error('Error during logout:', error);
     }
   };
-  const viewPDF = (factura) => {
-    setSelectedFactura(factura);
-  };
 
-  const closePDFViewer = () => {
-    setSelectedFactura(null);
-  };
+  
+  
   const renderFacturaItem = ({ item }) => (
     <View style={styles.facturaRow}>
       <Text>{new Date(item.fecha).toLocaleDateString()}</Text>
       <Text>${item.total.toFixed(2)}</Text>
       <Text>{item.usuario.direccion}</Text>
-      <TouchableOpacity onPress={() => viewPDF(item)} style={styles.pdfIconLink}>
+      <TouchableOpacity style={styles.pdfIconLink}>
         <Icon name="file-pdf-o" size={24} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -181,24 +178,25 @@ const PerfilComponent = () => {
 
           {/* Section to display PDF invoices */}
           {selectedFactura && (
-          <View style={styles.pdfViewer}>
-            <TouchableOpacity onPress={closePDFViewer} style={styles.closeButton}>
-              <Text style={styles.buttonText}>Cerrar</Text>
-            </TouchableOpacity>
-            <PDFView
-              fadeInDuration={250.0}
-              
-              resource={selectedFactura.pdfUrl}
-              resourceType="url"
-              onLoad={() => console.log(`PDF rendered from ${selectedFactura.pdfUrl}`)}
-              onError={(error) => console.log('Cannot render PDF', error)}
-            />
-          </View>
-        )}
+              <View style={styles.pdfViewer}>
+                <TouchableOpacity onPress={closePDFViewer} style={styles.closeButton}>
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
+                <PDFView
+                  fadeInDuration={250.0}
+                  resource={selectedFactura.pdfUrl}
+                  resourceType="url"
+                  onLoad={() => console.log(`PDF rendered from ${selectedFactura.pdfUrl}`)}
+                  onError={(error) => console.log('Cannot render PDF', error)}
+                />
+              </View>
+            )}
 
 <View style={styles.facturasContainer}>
           <Text style={styles.headingFacturas}>Historial de Compras</Text>
           <FlatList
+            nestedScrollEnabled={true}
+            scrollEnabled={false}
             data={facturas}
             renderItem={renderFacturaItem}
             keyExtractor={(item, index) => index.toString()}
