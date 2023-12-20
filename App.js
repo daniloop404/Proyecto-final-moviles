@@ -57,7 +57,11 @@ const CarritoStackScreen = () => {
       {isUserAuthenticated ? (
         <Stack.Screen name="Carro" component={CarritoScreen} />
       ) : (
-        <Stack.Screen name="Authentication" component={AuthenticationScreen} />
+        <>
+          <Stack.Screen name="Authentication" component={AuthenticationScreen} />
+          <Stack.Screen name="Login" component={LoginContent} />
+          <Stack.Screen name="Registro" component={Registro} />
+        </>
       )}
     </Stack.Navigator>
   );
